@@ -41,8 +41,15 @@ private:
 };
 
 SymTabNode symTable[20];
-//-----Terminal--------   		 kwdprog | kwdinput |kwdprint |kwdwhile |kwdif |kwdelseif |kwdelse | brace1 |brace2
-string parsTable[22][24] = { { "kwdprog Block", "N/A", "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "eps" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "N/A" , "eps } };
+//-----Terminal--------   		 kwdprog | kwdinput | kwdprint | kwdwhile | kwdif | kwdelseif | kwdelse | brace1 | brace2 | paraen1 | paren2 | semi | comma |  id  |  int  | float | string | plus | minus | aster | slash | caret | equal | eps
+int parsTable[22][24] = {		{    1    ,	  -1    ,	 -1    ,   -1     ,	 -1   ,	    -1    ,	    -1  ,    0   ,    -1  ,    -1   ,   -1   ,   -1 ,   -1  ,  -1  ,  -1   ,   -1  ,   -1   ,  -1  ,  -1   ,  -1   ,  -1   ,  -1   ,  -1   , -1 } //PGM
+								{   -1    ,	  -1    ,	  0    ,    0     ,	  0   ,	    -1    ,	    -1  ,    2   ,    -1  ,    -1   ,   -1   ,   -1 ,   -1  ,   0  ,  -1   ,   -1  ,   -1   ,  -1  ,  -1   ,  -1   ,  -1   ,  -1   ,  -1   ,  0 } //BLOCK
+								{   -1    ,	  -1    ,	  3    ,    3     ,	  3   ,	    -1    ,	    -1  ,   -1   ,    -1  ,    -1   ,   -1   ,   -1 ,   -1  ,   3  ,  -1   ,   -1  ,   -1   ,  -1  ,  -1   ,  -1   ,  -1   ,  -1   ,  -1   ,  0 } //STMTS
+								{   -1    ,	  -1    ,	  4    ,    5     ,	  6   ,	    -1    ,	    -1  ,    1   ,    -1  ,  	0   ,   -1   ,   -1 ,   -1  ,   7  ,  -1   ,   -1  ,   -1   ,  -1  ,  -1   ,  -1   ,  -1   ,  -1   ,   0   , -1 } //STMT
+								{   -1    ,	  -1    ,	 -1    ,   -1     ,	 -1   ,	    -1    ,	    -1  ,   -1   ,    -1  ,    -1   ,   -1   ,   -1 ,   -1  ,   8  ,  -1   ,   -1  ,   -1   ,  -1  ,  -1   ,  -1   ,  -1   ,  -1   ,  -1   , -1 } //ASTMT
+								{   -1    ,	   9    ,	 -1    ,   -1     ,	 -1   ,	    -1    ,	    -1  ,    0   ,    -1  ,    -1   ,   -1   ,   -1 ,   -1  ,  10  ,  10   ,   10  ,   10   ,   0  ,   0   ,   0   ,   0   ,   0   ,  -1   ,  0 } //Y
+								{   -1    ,	  -1    ,	 11    ,   -1     ,	 -1   ,	    -1    ,	    -1  ,   -1   ,    -1  ,    -1   ,   -1   ,   -1 ,   -1  ,  -1  ,  -1   ,   -1  ,   -1   ,  -1  ,  -1   ,  -1   ,  -1   ,  -1   ,  -1   , -1 } //OSTMT
+}
 
 
 #endif #pragma once
