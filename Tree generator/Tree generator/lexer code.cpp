@@ -16,9 +16,12 @@ This a brief program that takes input of user and translate into tokens
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <queue>
+#include "tokenobj.h"
+
 using namespace std;
 
-void checkString(string &search_store, string keywords[], int linecount, int &varcount); //function that check if string exist
+void checkString(string &search_store, tokenobj *tokenQ[], int &tokenCount, string keywords[], int keywordNum[], int linecount, int &varcount, fstream &myfile); //function that check if string exist
 
 
 int main() {
@@ -29,6 +32,7 @@ int main() {
 	string search_store = ""; //presently empty string, will store characters to comparison to keywords
 	string keywords[] = { "prog", "main", "fcn", "class", "float", "int", "string", "if", "elseif", "else",
 		"while", "input", "print", "new", "return" }; //list of keyword to compare with search_store
+	int keywordNum[] = { 1, -1, -1, -1, -1, -1, -1, 5, 6, 7, 4, 2, 3, -1 };
 
 	myfile.open("input.txt", ios::out | ios::trunc);
 	cout << "Write into text file (-quit to exit)\n";
@@ -56,6 +60,9 @@ int main() {
 	int linecount = 1; // counts number of lines
 	int varcount = 1; //counts number of variables and symbols
 
+	tokenobj* tokenQ[100];
+	int tokenCount = 0;
+
 	cout << "(:lang A3" << endl;
 	while (myfile.get(b)) // for loop goes through every character in the string variable ‘input’
 	{
@@ -63,18 +70,21 @@ int main() {
 	swtch_reboot:
 		switch (b) { // Jared implement cases for punctuation //----------------------------------
 
-		case '=':
-			checkString(search_store, keywords, linecount, varcount);
+		case '=':														//equal
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 
 
-			if (myfile.peek() == '=') { cout << "(:token " << linecount << " opec)" << endl; myfile.get(b); }
-			else { cout << "(:token " << linecount << " equal)" << endl; }
+			if (myfile.peek() == '=') { cout << "(:token " << linecount << " opec)" << endl; myfile.get(b); } 
+			else { cout << "(:token " << linecount << " equal)" << endl;
+			tokenQ[tokenCount] = new tokenobj("equal", 23, "=");
+			tokenCount++;
+			}
 			varcount++;
 			//cout << "=" << endl;
 			break;
 
 		case '<':
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 
 
 			if (myfile.peek() == '=') { cout << "(:token " << linecount << " ople)" << endl; myfile.get(b); }
@@ -83,7 +93,7 @@ int main() {
 			varcount++;
 			break;
 		case '>':
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 
 
 			if (myfile.peek() == '=') { cout << "(:token " << linecount << " opge)" << endl; myfile.get(b); }
@@ -93,7 +103,7 @@ int main() {
 			break;
 
 		case '!':
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 
 
 			if (myfile.peek() == '=') { cout << "(:token " << linecount << " opne)" << endl; myfile.get(b); }
@@ -101,8 +111,8 @@ int main() {
 			varcount++;
 			//cout << "=" << endl;
 			break;
-		case '-':
-			checkString(search_store, keywords, linecount, varcount);
+		case '-':															//minus
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 
 
 			if (myfile.peek() == '>') { cout << "(:token " << linecount << " oparrow)" << endl; myfile.get(b); } //check if next character is '>'
@@ -111,8 +121,9 @@ int main() {
 			{
 				search_store += b;
 				myfile.get(b);
+				bool once = false;
 
-				while (b == '0' | b == '1' | b == '2' | b == '3' | b == '4' | b == '5' | b == '6' | b == '7' | b == '8' | b == '9') { //while the next character is a digit
+				while (b == '0' | b == '1' | b == '2' | b == '3' | b == '4' | b == '5' | b == '6' | b == '7' | b == '8' | b == '9' | b == '.') { //while the next character is a digit
 
 					if (myfile.peek() == EOF) //If the pointer reach the end of the file
 					{
@@ -126,6 +137,15 @@ int main() {
 						break;
 
 					}
+					else if (b == '.' && !once)
+					{
+						search_store += b;
+						myfile.get(b);
+						once = true;
+					}
+					else if (b == '.' && once)
+						break;
+
 					else
 					{
 						search_store += b;
@@ -135,111 +155,147 @@ int main() {
 
 				}
 
-				cout << "(:token int str: \"" << search_store << "\") " << endl;
-				search_store = "";
+				if (once)
+				{
+					tokenQ[tokenCount] = new tokenobj("float", 16, search_store);
+					tokenCount++;
+
+					cout << "(:token float str: \"" << search_store << "\") " << endl;
+					search_store = "";
+				}
+				else
+				{
+					tokenQ[tokenCount] = new tokenobj("int", 15, search_store);
+					tokenCount++;
+
+					cout << "(:token int str: \"" << search_store << "\") " << endl;
+					search_store = "";
+				}
+
 
 			}
 
-			else { cout << "(:token " << linecount << " minus)" << endl; }
+			else { cout << "(:token " << linecount << " minus)" << endl; 
+			tokenQ[tokenCount] = new tokenobj("minus", 19, "-");
+			tokenCount++;
+			}
 			varcount++;
 			//cout << "=" << endl;
 			break;
 
 
 
-		case ',':
-			checkString(search_store, keywords, linecount, varcount);
+		case ',':														//comma done
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " comma)" << endl;
+			tokenQ[tokenCount] = new tokenobj("comma", 13, ",");
+			tokenCount++;
 			varcount++;
 
 			break;
 
-		case ';':
-			checkString(search_store, keywords, linecount, varcount);
+		case ';':														//semi done
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " semi)" << endl;
+			tokenQ[tokenCount] = new tokenobj("semicolon", 12, ";");
+			tokenCount++;
 			varcount++;
 
 			break;
 
-		case '{':
-			checkString(search_store, keywords, linecount, varcount);
+		case '{':														//brace1 done
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " brace1)" << endl;
+			tokenQ[tokenCount] = new tokenobj("brace1", 8, "{");
+			tokenCount++;
 			varcount++;
 
 			break;
 
-		case '}':
-			checkString(search_store, keywords, linecount, varcount);
+		case '}':														//brace2 done
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " brace2)" << endl;
+			tokenQ[tokenCount] = new tokenobj("brace2", 9, "}");
+			tokenCount++;
 			varcount++;
 
 			break;
 
 		case '[':
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " bracket1)" << endl;
 			varcount++;
 
 			break;
 
 		case ']':
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " bracket2)" << endl;
 			varcount++;
 
 			break;
 
-		case '(':
-			checkString(search_store, keywords, linecount, varcount);
+		case '(':														//praen1
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " parans1)" << endl;
+			tokenQ[tokenCount] = new tokenobj("paren1", 10, "(");
+			tokenCount++;
 			varcount++;
 
 			break;
 
-		case ')':
-			checkString(search_store, keywords, linecount, varcount);
+		case ')':														//paren2
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " parans2)" << endl;
+			tokenQ[tokenCount] = new tokenobj("paren2", 11, ")");
+			tokenCount++;
 			varcount++;
 
 			break;
 
-		case '*':
-			checkString(search_store, keywords, linecount, varcount);
+		case '*':														//aster
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " aster)" << endl;
+			tokenQ[tokenCount] = new tokenobj("aster", 20, "*");
+			tokenCount++;
 			varcount++;
 
 			break;
 
-		case '^':
-			checkString(search_store, keywords, linecount, varcount);
+		case '^':														//caret
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " caret)" << endl;
+			tokenQ[tokenCount] = new tokenobj("caret", 22, "^");
+			tokenCount++;
 			varcount++;
 
 			break;
 
 		case ':':
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " colon)" << endl;
 			varcount++;
 
 			break;
 
 		case '.':
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " dot)" << endl;
 			varcount++;
 
 			break;
 
-		case '+':
-			checkString(search_store, keywords, linecount, varcount);
+		case '+':														//plus
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			cout << "(:token " << linecount << " plus)" << endl;
+			tokenQ[tokenCount] = new tokenobj("plus", 18, "+");
+			tokenCount++;
 			varcount++;
 
 			break;
 
-		case '/':
-			checkString(search_store, keywords, linecount, varcount);
+		case '/':														//slash
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 			if (myfile.peek() == '/')
 			{
 				while (myfile.peek() != '\n')
@@ -249,7 +305,12 @@ int main() {
 
 			}
 			else
+			{
 				cout << "(:token " << linecount << " slash)" << endl;
+				tokenQ[tokenCount] = new tokenobj("slash", 21, "/");
+				tokenCount++;
+			}
+				
 
 			varcount++;
 			break;
@@ -257,7 +318,7 @@ int main() {
 
 		case '"':
 
-			search_store += b;
+			//search_store += b;
 			myfile.get(b);
 
 			while (b != '"') //Loop until next quotation mark is found
@@ -269,17 +330,18 @@ int main() {
 				myfile.get(b);
 			}
 
-			search_store += b; //store end quotation mark
+			//search_store += b; //store end quotation mark
 
 			cout << "(:token " << linecount << " string :str " << search_store << ")" << endl;
-
+			tokenQ[tokenCount] = new tokenobj("string", 17, search_store);
+			tokenCount++;
 			search_store = "";
 			varcount++;
 
 			break;
 
 		case ' ':	//switch(search_store){}; // kim-implement cases for all the keywords
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 
 
 			break;
@@ -322,6 +384,8 @@ int main() {
 				}
 				else {
 					cout << "(:token " << linecount << " int str: \"" << search_store << " \") " << endl;
+					tokenQ[tokenCount] = new tokenobj("brace1", 8, search_store);
+					tokenCount++;
 					search_store = "";
 					goto swtch_reboot;
 				}
@@ -364,6 +428,8 @@ int main() {
 					}
 					else {
 						cout << "(:token " << linecount << " int str: \"" << search_store << "\") " << endl;
+						tokenQ[tokenCount] = new tokenobj("int", 15, search_store);
+						tokenCount++;
 						search_store = "";
 						goto swtch_reboot;
 					}
@@ -385,6 +451,8 @@ int main() {
 				}
 			}
 			cout << "(:token " << linecount << " int str: \"" << search_store << "\") " << endl;
+			tokenQ[tokenCount] = new tokenobj("int", 15, search_store);
+			tokenCount++;
 			search_store = "";
 			varcount++;
 			if (b == '\n')
@@ -394,6 +462,8 @@ int main() {
 
 		floatloopend:
 			cout << "(:token " << linecount << " float str: \"" << search_store << "\") " << endl;
+			tokenQ[tokenCount] = new tokenobj("float", 16, search_store);
+			tokenCount++;
 			search_store = "";
 			varcount++;
 			if (b == '\n')
@@ -405,7 +475,7 @@ int main() {
 		case '\n': //check if at end of line
 		newLineJump:
 
-			checkString(search_store, keywords, linecount, varcount);
+			checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 
 			linecount++;
 			varcount = 1;
@@ -423,30 +493,50 @@ int main() {
 		//b=c;
 	}
 
-	checkString(search_store, keywords, linecount, varcount);
-
+	checkString(search_store, tokenQ, tokenCount, keywords, keywordNum, linecount, varcount, myfile);
 	cout << ")" << endl;
+
+	for (int i = 0; i < tokenCount; i++)
+		cout << "#" << i << ": token type: " << tokenQ[i]->tokenType() << "\ntoken ID: " << tokenQ[i]->tokenID() << "\ntoken name: " << tokenQ[i]->tokenName() << endl;
+
 	system("pause");
 	return 0;
 }
 
 
-void checkString(string &search_store, string keywords[], int linecount, int &varcount) //function that check if string exist
+void checkString(string &search_store, tokenobj *tokenQ[], int &tokenCount, string keywords[], int keywordNum[], int linecount, int &varcount, fstream &myfile) //function that check if string exist
 {
 	if (search_store != "") //check if search_store contains a string
 	{
 		cout << "(:token " << linecount;
 		int i;
+		int j;
 		for (i = 0; i < 15; i++) //go through list and compare keywords
 		{
 			if (search_store == keywords[i])
 			{
 				cout << " kwd" << keywords[i] << ")" << endl;
+				j = i;
 				i = 20;
 			}
 		}
 		if (i == 15)
+		{
 			cout << " ident :ix " << varcount << " :str \"" << search_store << "\")" << endl; //}
+			tokenQ[tokenCount] = new tokenobj("id", 15, search_store);
+			tokenCount++;
+
+		}
+			
+		else
+		{
+			if (keywordNum[j] != -1)
+			{
+				tokenQ[tokenCount] = new tokenobj("kwd" + keywords[j], keywordNum[j], search_store);
+				tokenCount++;
+			}
+			
+		}
 
 		search_store = "";
 		varcount++;
