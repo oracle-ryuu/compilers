@@ -8,6 +8,8 @@ public:
 	ruleobj(int ID, int _lhs, int count) {
 		ruleID = ID;	lhs = _lhs; kidCount = count;
 	}
+	ruleobj(int ID) : ruleID(ID)
+
 private:
 	int ruleID;
 	int lhs;// referring to symbols array

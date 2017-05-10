@@ -9,7 +9,10 @@ private:
 	string symName;
 	bool symKind; //0 for nonterminal 1 for terminal
 public:
-
+	int getSymid() { return symId; }
+	int getSymkind() { return symKind; }
+	string getSymName() { return symName; }
+}
 };
 
 
