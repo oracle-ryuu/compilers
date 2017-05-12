@@ -462,7 +462,8 @@ int main() {
 			varcount++;
 			if (b == '\n')
 				goto newLineJump;
-
+			else
+				goto swtch_reboot;
 			break;
 
 		floatloopend:
@@ -549,36 +550,60 @@ void lexerParser(queue<tokenobj*> &tokenQ)
 	populatesymArray();
 	populateRuleArray();
 
-	stack<symObj*> symS;
-	symS.push(symArray[0]);
-	symS.push(symArray[24]);
-	SymTabNode head;
-	int findRule = 0;
+	stack<symObj*> symS;		//creating stack symbol
+	symS.push(symArray[0]);		//setting last symbol eps for EOF sake
+	symS.push(symArray[24]);	//setting PGM on top
 
+	int findRule = 0;			//integer for obtaining rule
+	stack<symObj*> tempS;		//temporary debugging stack
+	queue<tokenobj*> tempQ;		//temporary debugging queue
 	while (!tokenQ.empty())
 	{
-		if (symS.top()->getSymid() == tokenQ.front()->tokenID())
+		//Checking current Stack and Queue
+		tempS = symS;
+		tempQ = tokenQ;
+
+		cout << "stack: ";
+
+		while (!tempS.empty())		//print out stack
+		{
+			cout << tempS.top()->getSymName() << " ";
+			tempS.pop();
+		}
+
+		cout << "\nqueue: ";
+
+		while (!tempQ.empty())		//print out queue
+		{
+			cout << tempQ.front()->tokenName() << " ";
+			tempQ.pop();
+		}
+		
+		cout << endl << endl;
+		//end checking Stack and Queue
+
+		if (symS.top()->getSymid() == tokenQ.front()->tokenID())	//if id for both queue and stack are the same. pop both off
 		{
 			cout << symS.top()->getSymName() << " found. popping off..." << endl;
 			symS.pop(); tokenQ.pop();
 		}
-		else
+		else														//top/front id on stack and queue are not same. get rule condition
 		{
-			findRule = parsTable[symS.top()->getSymid() - 24][tokenQ.front()->tokenID() - 1];
-			symS.pop();
+			findRule = parsTable[symS.top()->getSymid() - 24][tokenQ.front()->tokenID() - 1];	//store rule condition in findRule
+			symS.pop();																			//pop stack
 			cout << "use rule # " << findRule << endl;
-			if (findRule == -1)
+			if (findRule == -1)																	//if condition does not exist
 			{
 				cerr << "The fudge man?! you type something wrong!" << endl;
 				break;
 			}
-			else if (findRule == 0)
+			else if (findRule == 0)																//if condition is an eps
 			{
 				cout << "just pop it off." << endl;
 			}
 			else
 			{
-				for (int i = ruleArray[findRule]->getCount() - 1; i >= 0; i--)
+				for (int i = ruleArray[findRule]->getCount() - 1; i >= 0; i--)					//condition is found. push right hand rule in stack.
 				{
 					symS.push(symArray[ruleArray[findRule]->getRhs(i)]);
 				}

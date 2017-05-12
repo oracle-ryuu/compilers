@@ -57,7 +57,7 @@ void populateRuleArray()
 	ruleArray[7]->setRhs(0, 28);
 
 	ruleArray[8] = new ruleobj(8, 28, 3);
-	ruleArray[8]->setRhs(0, 18);
+	ruleArray[8]->setRhs(0, 14);
 	ruleArray[8]->setRhs(1, 23);
 	ruleArray[8]->setRhs(2, 29);
 
