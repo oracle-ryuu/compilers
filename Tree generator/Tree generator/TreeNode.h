@@ -5,6 +5,7 @@
 #include "symObj.h"
 using namespace std;
 
+//TreeNode* create_Kid(symObj child, int NodeID, ruleobj rule);
 class TreeNode
 {
 public:
@@ -12,11 +13,11 @@ public:
 		setID(0);
 		setSymKind(0);
 		setSymID(0);
-		
+
 	}
-				
-	
-	TreeNode(int id, int sym_id, int isTerm, int rule ) {
+
+
+	TreeNode(int id, int sym_id, int isTerm, int rule) {
 		setID(id);
 		setSymKind(sym_id);
 		setSymID(isTerm);
@@ -30,7 +31,7 @@ private:
 	TreeNode* kids[10];
 	int ruleID;
 public:
-	void setKid(int slot, symObj child, int NodeID, ruleobj rule) { kids[slot] = create_Kid(child, NodeID, rule); }
+	//void setKid(int slot, symObj child, int NodeID, ruleobj rule) { kids[slot] = create_Kid(child, NodeID, rule); }
 	void setID(int id) { ID = id; }
 	void setSymKind(int kind) { symKind = kind; }
 	void setSymID(int symid) { symID = symid; }
@@ -38,4 +39,4 @@ public:
 
 };
 
-TreeNode* create_Kid(symObj child, int NodeID,ruleobj rule) { return new TreeNode(NodeID,child.getSymid(), child.getSymkind(), rule.getID() ); }
+//TreeNode* create_Kid(symObj child, int NodeID, ruleobj rule) { return new TreeNode(NodeID, child.getSymid(), child.getSymkind(), rule.getID()); }

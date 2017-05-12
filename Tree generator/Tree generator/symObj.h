@@ -3,7 +3,7 @@
 using namespace std;
 class symObj {
 public:
-	symObj(int ID, string Name, bool isTerm) { symId = ID; symName = Name; isTerm == symKind; }
+	symObj(int ID, string Name, bool isTerm) { symId = ID; symName = Name; isTerm = symKind; }
 private:
 	int symId;
 	string symName;
@@ -12,11 +12,10 @@ public:
 	int getSymid() { return symId; }
 	int getSymkind() { return symKind; }
 	string getSymName() { return symName; }
-}
 };
 
 
-symObj* symArray[24];
+symObj* symArray[45];
 
 void populatesymArray(){
 	symArray[0] = new symObj(0, "epsilon", 1);
@@ -37,14 +36,14 @@ void populatesymArray(){
 	symArray[15] = new symObj(15, "int", 1);
 	symArray[16] = new symObj(16, "float", 1);
 	symArray[17] = new symObj(17, "string", 1);
-	symArray[18] = new symObj(181, "plus", 1);
+	symArray[18] = new symObj(18, "plus", 1);
 	symArray[19] = new symObj(19, "minus", 1);
 	symArray[20] = new symObj(20, "aster", 1);
 	symArray[21] = new symObj(21, "slash", 1);
 	symArray[22] = new symObj(22, "caret", 1);
 	symArray[23] = new symObj(23, "equal", 1);
 	//nonterminals start here -----------------------------------------------------------
-	symArray[24] = new symObj(0, "PGM", 0);
+	symArray[24] = new symObj(24, "PGM", 0);
 	symArray[25] = new symObj(25, "BLOCK", 0);
 	symArray[26] = new symObj(26, "STMTS", 0);
 	symArray[27] = new symObj(27, "STMT", 0);
