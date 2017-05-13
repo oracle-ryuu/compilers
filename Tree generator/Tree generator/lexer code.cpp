@@ -473,6 +473,8 @@ int main() {
 			varcount++;
 			if (b == '\n')
 				goto newLineJump;
+			else
+				goto swtch_reboot;
 
 			break;
 
