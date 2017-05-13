@@ -32,6 +32,9 @@ private:
 	int ruleID;
 public:
 	//void setKid(int slot, symObj child, int NodeID, ruleobj rule) { kids[slot] = create_Kid(child, NodeID, rule); }
+	void setKid(TreeNode* kid, int slotNumber) {
+		kids[slotNumber] = kid;
+	}
 	void setID(int id) { ID = id; }
 	void setSymKind(int kind) { symKind = kind; }
 	void setSymID(int symid) { symID = symid; }
